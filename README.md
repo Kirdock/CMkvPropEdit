@@ -1,5 +1,5 @@
 # CMkvPropEdit 
-CMkvPropEdit is a C# variant of JMkvpropedit or in other words a user interface for operations with mkvpropedit with the addition apply settings on multiple files
+CMkvPropEdit is a C# variant of JMkvpropedit or in other words a graphical interface and multi-file support for mkvpropedit
 
 # What's the difference to JMkvpropedit
 1. It's C# and not Java
