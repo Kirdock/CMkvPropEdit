@@ -1,12 +1,14 @@
-﻿namespace CMkvPropEdit.Classes
+﻿using System;
+
+namespace CMkvPropEdit.Classes
 {
+    [Serializable]
     class GeneralInfo
     {
-        internal TrackNumberCheck TrackNameAndNumber;
-        internal ModifyAction Chapters;
-        internal ModifyAction Tags;
-        internal TextCheck Parameters;
-        //textBox1.DataBindings.Add("Text", bookProperty[0], "bookTitle", true, DataSourceUpdateMode.OnPropertyChanged);
+        public TrackNumberCheck TrackNameAndNumber;
+        public ModifyAction Chapters;
+        public ModifyAction Tags;
+        public TextCheck Parameters;
 
         internal GeneralInfo()
         {

@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 namespace CMkvPropEdit.Classes
 {
+    [Serializable]
     class Numeration : CheckItem
     {
-        internal int Start;
-        internal int Padding; //Padding for leading zeroes; could be discarded. Can always be added, just take start number and add file count => # of digits - # of digits of current number
-        internal string Name;
+        public int Start { get; set; }
+        public int Padding { get; set; } //Padding for leading zeroes; could be discarded. Can always be added, just take start number and add file count => # of digits - # of digits of current number
+        public string Name;
         //internal string Description => "To use it, add {num} to the name (e.g. \"My "+ Name + " {num}\"). Use {file_name} to use the file name as the name.";
         internal Numeration(TrackType type)
         {
+            Start = Padding = 1;
             switch (type)
             {
                 case TrackType.General:

@@ -1,4 +1,5 @@
-﻿using CMkvPropEdit.Helper;
+﻿using CMkvPropEdit.Classes;
+using CMkvPropEdit.Helper;
 using CMkvPropEdit.View;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -48,6 +49,11 @@ namespace CMkvPropEdit
 
             TxtOptionsPresetPath.Text = Properties.Settings.Default.PresetPath;
             TxtOptionsPropeditPath.Text = Properties.Settings.Default.MKVPropeditPath;
+            CmBOptionPresets.Items.AddRange(SaveService.GetPresetNames().ToArray());
+            if (CmBOptionPresets.Items.Count != 0)
+            {
+                CmBOptionPresets.SelectedIndex = 0;
+            }
         }
 
         private void CreateDirectoryIfNotExists(string directory)
@@ -189,12 +195,25 @@ namespace CMkvPropEdit
 
         private void BtnOptionSavePreset_Click(object sender, EventArgs e)
         {
-            using (InsertText form = new InsertText("Enter preset name", "Enter name"))
+            HashSet<string> fileNames = new HashSet<string>(SaveService.GetPresetNames());
+            using (InsertText form = new InsertText("Enter preset name", "Enter name",string.Empty, fileNames))
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    CmBOptionPresets.Items.Add(form.NewText);
-                    //TO-DO: Save file
+                    Preset preset = new Preset(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null);
+                    if (SaveService.SavePreset(preset, form.NewText))
+                    {
+                        if (fileNames.Contains(form.NewText))
+                        {
+                            MessageService.ShowInformation("Overwritten");
+                        }
+                        else
+                        {
+                            CmBOptionPresets.Items.Add(form.NewText);
+                            MessageService.ShowInformation("Saved");
+                        }
+                        
+                    }
                 }
             }
         }
@@ -203,13 +222,17 @@ namespace CMkvPropEdit
         {
             if (CmBOptionPresets.SelectedIndex != -1)
             {
-                HashSet<string> permittedNames = new HashSet<string>(CmBOptionPresets.Items.Cast<string>().Where(preset => preset != CmBOptionPresets.SelectedText));
-                using (InsertText form = new InsertText("Rename preset name", "Enter name", CmBOptionPresets.SelectedText, permittedNames))
+                string selectedPresetName = CmBOptionPresets.SelectedItem.ToString();
+                HashSet<string> permittedNames = new HashSet<string>(CmBOptionPresets.Items.Cast<string>().Where(preset => preset != selectedPresetName));
+                using (InsertText form = new InsertText("Rename preset name", "Enter name", selectedPresetName, permittedNames))
                 {
-                    if (form.ShowDialog() == DialogResult.OK)
+                    if (form.ShowDialog() == DialogResult.OK && selectedPresetName != form.NewText)
                     {
-                        CmBOptionPresets.Items[CmBOptionPresets.SelectedIndex] = form.NewText;
-                        //TO-DO: Rename file
+                        if (SaveService.RenamePreset(selectedPresetName, form.NewText))
+                        {
+                            CmBOptionPresets.Items[CmBOptionPresets.SelectedIndex] = form.NewText;
+                            MessageService.ShowInformation("Renamed");
+                        }
                     }
                 }
             }
@@ -219,22 +242,57 @@ namespace CMkvPropEdit
         {
             if (CmBOptionPresets.SelectedIndex != -1)
             {
-                CmBOptionPresets.Items.RemoveAt(CmBOptionPresets.SelectedIndex);
-                //TO-DO: Delete file
+                if (SaveService.DeletePreset(CmBOptionPresets.SelectedItem.ToString()))
+                {
+                    CmBOptionPresets.Items.RemoveAt(CmBOptionPresets.SelectedIndex);
+                }
             }
         }
 
         private void BtnOptionLoadPreset_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            if (CmBOptionPresets.SelectedIndex != -1)
+            {
+                Preset preset = SaveService.LoadPreset(CmBOptionPresets.SelectedItem.ToString());
+                if (preset != null)
+                {
+                    videoTrackView.TrackInfos = preset.VideoInfo.ToList();
+                    subtitleTrackView.TrackInfos = preset.SubtitleInfo.ToList();
+                    audioTrackView.TrackInfos = preset.AudioInfo.ToList();
+                    MessageService.ShowInformation("Loaded");
+                }
+            }
         }
 
 
         #endregion
 
+        private void StartProgressBar(int count)
+        {
+            PgLoading.Value = 0;
+            PgLoading.Maximum = count;
+        }
+
+        private void UpdateProgressbar()
+        {
+            PgLoading.Invoke(new MethodInvoker(()=>
+            {
+                if (PgLoading.Value < PgLoading.Maximum)
+                {
+                    PgLoading.Value++;
+                    if(PgLoading.Value == PgLoading.Maximum)
+                    {
+                        MessageService.ShowInformation("Finished!");
+                        PgLoading.Value = PgLoading.Maximum = 0;
+                    }
+                }
+            }));
+        }
+
         private void BtnProcessFiles_Click(object sender, EventArgs e)
         {
-            ExecuteService.SetCmdLine(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null, LBInput.Items.Cast<string>().ToArray());
+            StartProgressBar(LBInput.Items.Count);
+            ExecuteService.SetCmdLine(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null, LBInput.Items.Cast<string>().ToArray(), UpdateProgressbar);
         }
     }
 }

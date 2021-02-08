@@ -28,11 +28,12 @@ namespace CMkvPropEdit.View
 
         private void Confirm()
         {
+            DialogResult result = DialogResult.Yes;
             if (PermittedNames != null && PermittedNames.Contains(TxTName.Text))
             {
-                MessageService.ShowWarning("Name is already taken!");
+                result = MessageService.ShowQuestion("Name is already taken!\nDo you want to override it?");
             }
-            else
+            if(result == DialogResult.Yes)
             {
                 DialogResult = DialogResult.OK;
             }

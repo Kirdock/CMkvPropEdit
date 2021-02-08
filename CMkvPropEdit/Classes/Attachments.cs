@@ -1,12 +1,14 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace CMkvPropEdit.Classes
 {
+    [Serializable]
     class Attachments
     {
-        internal DataTable AddTable;
-        internal DataTable ReplaceTable;
-        internal DataTable DeleteTable;
+        public DataTable AddTable;
+        public DataTable ReplaceTable;
+        public DataTable DeleteTable;
 
         internal Attachments()
         {

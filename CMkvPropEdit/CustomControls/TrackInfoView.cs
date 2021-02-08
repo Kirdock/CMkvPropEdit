@@ -1,6 +1,7 @@
 ﻿using CMkvPropEdit.Classes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CMkvPropEdit.CustomControls
@@ -9,7 +10,24 @@ namespace CMkvPropEdit.CustomControls
     {
         private readonly TrackType Type;
         private readonly string DefaultTrackName;
-        internal readonly List<TrackInfo> TrackInfos;
+        private List<TrackInfo> trackInfos;
+        internal List<TrackInfo> TrackInfos
+        {
+            get
+            {
+                return trackInfos;
+            }
+            set
+            {
+                trackInfos = value;
+                CmBTrack.Items.Clear();
+                if (trackInfos.Count != 0)
+                {
+                    CmBTrack.Items.AddRange(trackInfos.Select(info => info.Name).ToArray());
+                    CmBTrack.SelectedIndex = 0;
+                }
+            }
+        }
         private TrackInfo SelectedTrack;
 
         public bool IsDefaultEnabled {
@@ -20,10 +38,22 @@ namespace CMkvPropEdit.CustomControls
             set
             {
                 SelectedTrack.IsEnabled = value;
-                IsDefaultTrackChildEnabled = false;
+                IsForcedTrackChildEnabled = IsDefaultTrackChildEnabled = false;
             }
         }
 
+        public bool IsForcedTrackEnabled
+        {
+            get
+            {
+                return SelectedTrack.ForcedTrack.IsEnabled;
+            }
+            set
+            {
+                SelectedTrack.ForcedTrack.IsEnabled = value;
+                IsForcedTrackChildEnabled = false;
+            }
+        }
         public bool IsDefaultTrackEnabled
         {
             get
@@ -34,6 +64,18 @@ namespace CMkvPropEdit.CustomControls
             {
                 SelectedTrack.DefaultTrack.IsEnabled = value;
                 IsDefaultTrackChildEnabled = false;
+            }
+        }
+        private bool isForcedTrackChildEnabled;
+        public bool IsForcedTrackChildEnabled
+        {
+            get
+            {
+                return isForcedTrackChildEnabled;
+            }
+            set
+            {
+                isForcedTrackChildEnabled = SelectedTrack.IsEnabled && SelectedTrack.ForcedTrack.IsEnabled;
             }
         }
         private bool isDefaultTrackChildEnabled;
@@ -69,6 +111,11 @@ namespace CMkvPropEdit.CustomControls
                 default:
                     break;
             }
+            LblTrackName.Text = "To use it, add {num} to the name (e.g. \"My " + type.ToString() + " {num}\"). Use {file_name} to use the file name as the name.";
+            CmBLanguage.DataSource = new BindingSource(StaticData.Languages, null);
+            CmBLanguage.DisplayMember = "value";
+            CmBLanguage.ValueMember = "key";
+            
             BtnAdd_Click(null, null);
         }
 
@@ -79,7 +126,7 @@ namespace CMkvPropEdit.CustomControls
             TrackInfos.Add(info);
             CmBTrack.Items.Add(name);
 
-            CmBTrack.SelectedIndex = 0;
+            CmBTrack.SelectedIndex = CmBTrack.Items.Count -1;
         }
 
         private void CmBTrack_SelectedIndexChanged(object sender, EventArgs e)
@@ -90,51 +137,79 @@ namespace CMkvPropEdit.CustomControls
 
         private void SetSelectedItem(TrackInfo info)
         {
-            CBEditTrack.DataBindings.Clear();
-            RBDefaultTrackYes.DataBindings.Clear();
-            CBDefaultTrack.DataBindings.Clear();
-            RBDefaultTrackNo.DataBindings.Clear();
+            ClearBindings(CBEditTrack, RBDefaultTrackNo, RBDefaultTrackYes, CBDefaultTrack, CBForcedTrack, CBTrackName, RBForcedNo, RBForcedYes, CmBLanguage, NBStart, NBPadding, CBNumbering, CBParameters, TxtParameters, TxtTrackName, CBLanguage);
             isDefaultTrackChildEnabled = info.DefaultTrack.IsEnabled;
+            isForcedTrackChildEnabled = info.ForcedTrack.IsEnabled;
+            SetEnabled("IsDefaultEnabled", CBDefaultTrack, CBTrackName, CBLanguage, CBParameters, CBForcedTrack);
+            SetEnabled("IsDefaultTrackChildEnabled", RBDefaultTrackYes, RBDefaultTrackNo);
+            SetEnabled("IsForcedTrackChildEnabled", RBForcedYes, RBForcedNo);
 
-            CBDefaultTrack.DataBindings.Add(new Binding("Enabled", this, "IsDefaultEnabled")
-            {
-                DataSourceUpdateMode = DataSourceUpdateMode.Never,
-                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged
-            });
+            CBEditTrack.DataBindings.Add(TwoWayBinding("Checked", this, "IsDefaultEnabled"));
+            CBDefaultTrack.DataBindings.Add(TwoWayBinding("Checked", this, "IsDefaultTrackEnabled"));
+            CBForcedTrack.DataBindings.Add(TwoWayBinding("Checked", this, "IsForcedTrackEnabled"));
 
-            RBDefaultTrackYes.DataBindings.Add(new Binding("Enabled", this, "IsDefaultTrackChildEnabled")
-            {
-                DataSourceUpdateMode = DataSourceUpdateMode.Never,
-                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged,
-            });
+            CBLanguage.DataBindings.Add(TwoWayBinding("Checked", info.Language, "IsEnabled"));
+            CBTrackName.DataBindings.Add(TwoWayBinding("Checked", info.TrackNameAndNumber.TrackName, "IsEnabled"));
+            CBParameters.DataBindings.Add(TwoWayBinding("Checked", info.Parameters, "IsEnabled"));
 
-            RBDefaultTrackNo.DataBindings.Add(new Binding("Enabled", this, "IsDefaultTrackChildEnabled")
-            {
-                DataSourceUpdateMode = DataSourceUpdateMode.Never,
-                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged,
-            });
-
-
-            CBEditTrack.DataBindings.Add(new Binding("Checked", this, "IsDefaultEnabled")
-            {
-                DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged,
-                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged
-            });
+            RBDefaultTrackYes.DataBindings.Add(TwoWayBinding("Checked", info.DefaultTrack, "Value"));
+            RBForcedYes.DataBindings.Add(TwoWayBinding("Checked", info.ForcedTrack, "Value"));
+            TxtTrackName.DataBindings.Add("Text", info.TrackNameAndNumber.TrackName, "Text");
+            TxtParameters.DataBindings.Add("Text", info.Parameters, "Text");
+            CBNumbering.DataBindings.Add(TwoWayBinding("Checked", info.TrackNameAndNumber.Numbering, "IsEnabled"));
+            NBStart.DataBindings.Add(TwoWayBinding("Value", info.TrackNameAndNumber.Numbering, "Start"));
+            NBPadding.DataBindings.Add(TwoWayBinding("Value", info.TrackNameAndNumber.Numbering, "Padding"));
+            CmBLanguage.DataBindings.Add(TwoWayBinding("SelectedValue", info.Language, "Text"));
 
 
-            CBDefaultTrack.DataBindings.Add(new Binding("Checked", this, "IsDefaultTrackEnabled")
-            {
-                DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged,
-                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged
-            });
-            
-
-            
-            RBDefaultTrackYes.DataBindings.Add("Checked", info.DefaultTrack, "Value");
-            
             if (!info.DefaultTrack.Value)
             {
                 RBDefaultTrackNo.Checked = true;
+            }
+            if (!info.ForcedTrack.Value)
+            {
+                RBForcedNo.Checked = true;
+            }
+        }
+
+        private Binding TwoWayBinding(string property, object source, string dataMember)
+        {
+            return new Binding(property, source, dataMember)
+            {
+                DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged,
+                ControlUpdateMode = ControlUpdateMode.OnPropertyChanged
+            };
+        }
+
+        
+        private void ClearBindings(params Control[] controls)
+        {
+            foreach (Control control in controls)
+            {
+                control.DataBindings.Clear();
+            }
+        }
+
+        private void SetEnabled(string property, params Control[] controls)
+        {
+            foreach(Control control in controls)
+            {
+                control.DataBindings.Add(new Binding("Enabled", this, property)
+                {
+                    DataSourceUpdateMode = DataSourceUpdateMode.Never,
+                    ControlUpdateMode = ControlUpdateMode.OnPropertyChanged,
+                });
+            }
+        }
+
+        private void BtnRemove_Click(object sender, EventArgs e)
+        {
+            if (CmBTrack.SelectedIndex != -1)
+            {
+                int index = CmBTrack.SelectedIndex;
+                TrackInfos.RemoveAt(index);
+                CmBTrack.Items.RemoveAt(index);
+                CmBTrack.SelectedIndex = index - 1;
             }
         }
     }

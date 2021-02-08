@@ -1,9 +1,12 @@
-﻿namespace CMkvPropEdit.Classes
+﻿using System;
+
+namespace CMkvPropEdit.Classes
 {
+    [Serializable]
     class TrackNumberCheck
     {
-        internal TextCheck TrackName;
-        internal Numeration Numbering;
+        public TextCheck TrackName;
+        public Numeration Numbering;
 
         internal TrackNumberCheck(TrackType type)
         {

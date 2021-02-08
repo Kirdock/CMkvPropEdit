@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using CMkvPropEdit.Classes;
 using System.Data;
+using System.Windows.Forms;
 
 namespace CMkvPropEdit.Helper
 {
@@ -128,7 +129,7 @@ namespace CMkvPropEdit.Helper
 
                 for (int j = 0; j < infos.Length; j++)
                 {
-                    TrackInfo info = infos[i];
+                    TrackInfo info = infos[j];
                     tmpCmdLineOpt[j] = "";
                     if (info.IsEnabled)
                     {
@@ -141,9 +142,9 @@ namespace CMkvPropEdit.Helper
                             builder.Append(" --set flag-default=").Append(info.DefaultTrack.Value ? '1' : '0');
                         }
 
-                        if (info.Forcedtrack.IsEnabled)
+                        if (info.ForcedTrack.IsEnabled)
                         {
-                            builder.Append(" --set flag-forced=").Append(info.Forcedtrack.Value ? '1' : '0');
+                            builder.Append(" --set flag-forced=").Append(info.ForcedTrack.Value ? '1' : '0');
                         }
 
                         if (info.TrackNameAndNumber.TrackName.IsEnabled)
@@ -226,7 +227,6 @@ namespace CMkvPropEdit.Helper
             }
         }
 
-
         private static string SetCmdLineAttachmentsReplace(DataTable table)
         {
             StringBuilder attachmentsDelete = new StringBuilder();
@@ -284,98 +284,56 @@ namespace CMkvPropEdit.Helper
             return attachmentDelete.ToString();
         }
 
-        internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames)
+        internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action update)
         {
-            string[] cmdLineGeneralOpt = SetCmdLineGeneral(generalInfo, fileNames);
+            //string[] cmdLineGeneralOpt = SetCmdLineGeneral(generalInfo, fileNames);
             string[] cmdLineVideoOpt = SetCmdLineTrack(videoInfo, fileNames);
             string[] cmdLineAudioOpt = SetCmdLineTrack(audioInfo, fileNames);
             string[] cmdLineSubtitleOpt = SetCmdLineTrack(subtitleInfo, fileNames);
             
-            string cmdLineAttachmentsAddOpt = SetCmdLineAttachmentsAdd(attachments.AddTable);
-            string cmdLineAttachmentsDeleteOpt = SetCmdLineAttachmentsReplace(attachments.ReplaceTable);
-            string cmdLineAttachmentsReplaceOpt = SetCmdLineAttachmentsDelete(attachments.DeleteTable);
+            //string cmdLineAttachmentsAddOpt = SetCmdLineAttachmentsAdd(attachments.AddTable);
+            //string cmdLineAttachmentsDeleteOpt = SetCmdLineAttachmentsReplace(attachments.ReplaceTable);
+            //string cmdLineAttachmentsReplaceOpt = SetCmdLineAttachmentsDelete(attachments.DeleteTable);
 
             string[] cmdLineBatchOpt = new string[fileNames.Length];
 
             for (int i = 0; i < fileNames.Length; i++)
             {
-                string cmdLineAllOpt = cmdLineGeneralOpt[i] + cmdLineAttachmentsDeleteOpt + cmdLineAttachmentsAddOpt
-                        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
+                //string cmdLineAllOpt = cmdLineGeneralOpt[i] + cmdLineAttachmentsDeleteOpt + cmdLineAttachmentsAddOpt
+                //        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
+                string cmdLineAllOpt = cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
 
                 cmdLineBatchOpt[i] = "\"" + EscapeName(fileNames[i]) + "\"" + cmdLineAllOpt;
             }
 
-            ExecuteBatch(cmdLineBatchOpt, fileNames);
+            ExecuteBatch(cmdLineBatchOpt, fileNames, update);
         }
 
-        private static void ExecuteBatch(string[] cmdLineBatchOpt, string[] filesNames)
+        private static void ExecuteBatch(string[] cmdLineBatchOpt, string[] filesNames, Action update)
         {
             Thread thread = new Thread(()=>
             {
-                for (int i = 0; i < cmdLineBatchOpt.Length; i++)
+                try
                 {
-                    try
+                    for (int i = 0; i < cmdLineBatchOpt.Length; i++)
                     {
-                        System.Diagnostics.Process.Start("CMD.exe", "/C " + cmdLineBatchOpt[i]);
-                        //File optFile = new File("options.json");
-                        //PrintWriter optFilePW = new PrintWriter(optFile, "UTF-8");
-                        //string[] optFileContents = Commandline.translateCommandline(cmdLineBatchOpt[i]);
-                        //int optFileMaxLines = optFileContents.Length - 1;
-
-                        //if (!optFile.exists())
-                        //{
-                        //    optFile.createNewFile();
-                        //}
-
-                        //optFilePW.println("[");
-                        //int curLine = 0;
-                        //foreach (string content in optFileContents)
-                        //{
-                        //    //content = Utils.fixEscapedQuotes(content);
-
-                        //    optFilePW.print("  \"" + content + "\"");
-                        //    if (curLine != optFileMaxLines)
-                        //    {
-                        //        optFilePW.print(",");
-                        //    }
-                        //    optFilePW.println();
-                        //    curLine++;
-                        //}
-                        //optFilePW.println("]");
-
-                        //optFilePW.flush();
-                        //optFilePW.close();
-
-                        //pb.command(Properties.Settings.Default.MKVPropeditPath, "@options.json");
-                        //pb.redirectErrorStream(true);
-
-                        ////txtOutput.append("File: " + fileNames[i] + "\n");
-                        ////txtOutput.append("Command line: " + cmdLineBatch.get(i) + "\n\n");
-
-                        //proc = pb.start();
-
-                        //StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream(), txtOutput);
-                        //outputGobbler.start();
-
-                        //proc.waitFor();
-
-                        //optFile.delete();
-
-                        //if (i < cmdLineBatch.size() - 1)
-                        //{
-                        //    txtOutput.append("--------------\n\n");
-                        //}
-
-                        //Thread.Sleep(10);
+                        System.Diagnostics.Process process = new System.Diagnostics.Process
+                        {
+                            StartInfo = new System.Diagnostics.ProcessStartInfo
+                            {
+                                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                                FileName = Properties.Settings.Default.MKVPropeditPath,
+                                Arguments = cmdLineBatchOpt[i]
+                            }
+                        };
+                        process.Start();
+                        process.WaitForExit();
+                        update();
                     }
-                    catch(Exception ex)
-                    {
-
-                    }
-                    //} catch (IOException e) {
-                    //} catch (InterruptedException e) {
-                    //    break;
-                    //}
+                }
+                catch (Exception ex)
+                {
+                    MessageService.ShowError(ex.Message);
                 }
             });
             thread.SetApartmentState(ApartmentState.STA);

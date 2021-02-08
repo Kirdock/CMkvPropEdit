@@ -61,6 +61,7 @@
     <Compile Include="Classes\CheckItem.cs" />
     <Compile Include="Classes\GeneralInfo.cs" />
     <Compile Include="Classes\Numeration.cs" />
+    <Compile Include="Classes\Preset.cs" />
     <Compile Include="Classes\TrackNumberCheck.cs" />
     <Compile Include="Classes\StaticData.cs" />
     <Compile Include="Classes\TextCheck.cs" />
@@ -79,6 +80,7 @@
     </Compile>
     <Compile Include="Helper\ExecuteService.cs" />
     <Compile Include="Helper\MessageService.cs" />
+    <Compile Include="Helper\SaveService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="View\InsertText.cs">
