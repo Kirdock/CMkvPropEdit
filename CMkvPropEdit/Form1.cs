@@ -5,13 +5,9 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CMkvPropEdit
@@ -23,6 +19,9 @@ namespace CMkvPropEdit
         public Form1()
         {
             InitializeComponent();
+            videoTrackView.SetType(TrackType.Video);
+            audioTrackView.SetType(TrackType.Audio);
+            subtitleTrackView.SetType(TrackType.Subtitle);
             InitSettings();
         }
 
@@ -289,10 +288,37 @@ namespace CMkvPropEdit
             }));
         }
 
+        private void UpdateOutput(string command, string output)
+        {
+            RTxtOutput.Invoke(new MethodInvoker(() =>
+            {
+                RTxtOutput.SelectionFont = new System.Drawing.Font(RTxtOutput.Font, System.Drawing.FontStyle.Bold);
+                RTxtOutput.AppendText("Command:");
+                RTxtOutput.SelectionFont = new System.Drawing.Font(RTxtOutput.Font, System.Drawing.FontStyle.Regular);
+                RTxtOutput.AppendText(Environment.NewLine + command);
+                RTxtOutput.SelectionFont = new System.Drawing.Font(RTxtOutput.Font, System.Drawing.FontStyle.Bold);
+                RTxtOutput.AppendText(Environment.NewLine + "Output:");
+                RTxtOutput.SelectionFont = new System.Drawing.Font(RTxtOutput.Font, System.Drawing.FontStyle.Regular);
+                RTxtOutput.AppendText(Environment.NewLine + output + Environment.NewLine);
+            }));
+        }
+
+        private void Updates(string command, string output)
+        {
+            UpdateProgressbar();
+            UpdateOutput(command, output);
+        }
+
         private void BtnProcessFiles_Click(object sender, EventArgs e)
         {
             StartProgressBar(LBInput.Items.Count);
-            ExecuteService.SetCmdLine(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null, LBInput.Items.Cast<string>().ToArray(), UpdateProgressbar);
+            ClearOutput();
+            ExecuteService.SetCmdLine(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null, LBInput.Items.Cast<string>().ToArray(), Updates);
+        }
+
+        private void ClearOutput()
+        {
+            RTxtOutput.Text = string.Empty;
         }
     }
 }

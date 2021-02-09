@@ -1,7 +1,4 @@
-﻿
-using CMkvPropEdit.CustomControls;
-
-namespace CMkvPropEdit
+﻿namespace CMkvPropEdit
 {
     partial class Form1
     {
@@ -32,9 +29,6 @@ namespace CMkvPropEdit
         private void InitializeComponent()
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.videoTrackView = new TrackInfoView(Classes.TrackType.Video);
-            this.audioTrackView = new TrackInfoView(Classes.TrackType.Audio);
-            this.subtitleTrackView = new TrackInfoView(Classes.TrackType.Subtitle);
             this.TPInput = new System.Windows.Forms.TabPage();
             this.BtnInputFolder = new System.Windows.Forms.Button();
             this.BtnInputRemove = new System.Windows.Forms.Button();
@@ -43,8 +37,11 @@ namespace CMkvPropEdit
             this.LBInput = new System.Windows.Forms.ListBox();
             this.TPGeneral = new System.Windows.Forms.TabPage();
             this.TPVideo = new System.Windows.Forms.TabPage();
+            this.videoTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPAudio = new System.Windows.Forms.TabPage();
+            this.audioTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPSubtitles = new System.Windows.Forms.TabPage();
+            this.subtitleTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPOptions = new System.Windows.Forms.TabPage();
             this.BtnOptionRenamePreset = new System.Windows.Forms.Button();
             this.BtnOptionDeletePreset = new System.Windows.Forms.Button();
@@ -61,6 +58,7 @@ namespace CMkvPropEdit
             this.TxtOptionsPropeditPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.TPOutput = new System.Windows.Forms.TabPage();
+            this.RTxtOutput = new System.Windows.Forms.RichTextBox();
             this.BtnProcessFiles = new System.Windows.Forms.Button();
             this.PgLoading = new System.Windows.Forms.ProgressBar();
             this.tabControl1.SuspendLayout();
@@ -69,6 +67,7 @@ namespace CMkvPropEdit
             this.TPAudio.SuspendLayout();
             this.TPSubtitles.SuspendLayout();
             this.TPOptions.SuspendLayout();
+            this.TPOutput.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -99,7 +98,7 @@ namespace CMkvPropEdit
             this.TPInput.Location = new System.Drawing.Point(4, 22);
             this.TPInput.Name = "TPInput";
             this.TPInput.Padding = new System.Windows.Forms.Padding(3);
-            this.TPInput.Size = new System.Drawing.Size(790, 380);
+            this.TPInput.Size = new System.Drawing.Size(790, 378);
             this.TPInput.TabIndex = 0;
             this.TPInput.Text = "Input";
             this.TPInput.UseVisualStyleBackColor = true;
@@ -168,7 +167,7 @@ namespace CMkvPropEdit
             this.TPGeneral.Location = new System.Drawing.Point(4, 22);
             this.TPGeneral.Name = "TPGeneral";
             this.TPGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.TPGeneral.Size = new System.Drawing.Size(790, 380);
+            this.TPGeneral.Size = new System.Drawing.Size(790, 378);
             this.TPGeneral.TabIndex = 1;
             this.TPGeneral.Text = "General";
             this.TPGeneral.UseVisualStyleBackColor = true;
@@ -179,7 +178,7 @@ namespace CMkvPropEdit
             this.TPVideo.Location = new System.Drawing.Point(4, 22);
             this.TPVideo.Name = "TPVideo";
             this.TPVideo.Padding = new System.Windows.Forms.Padding(3);
-            this.TPVideo.Size = new System.Drawing.Size(790, 380);
+            this.TPVideo.Size = new System.Drawing.Size(790, 378);
             this.TPVideo.TabIndex = 2;
             this.TPVideo.Text = "Video";
             this.TPVideo.UseVisualStyleBackColor = true;
@@ -187,14 +186,11 @@ namespace CMkvPropEdit
             // videoTrackView
             // 
             this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.videoTrackView.IsDefaultEnabled = false;
             this.videoTrackView.IsDefaultTrackChildEnabled = false;
-            this.videoTrackView.IsDefaultTrackEnabled = false;
             this.videoTrackView.IsForcedTrackChildEnabled = false;
-            this.videoTrackView.IsForcedTrackEnabled = false;
             this.videoTrackView.Location = new System.Drawing.Point(3, 3);
             this.videoTrackView.Name = "videoTrackView";
-            this.videoTrackView.Size = new System.Drawing.Size(784, 374);
+            this.videoTrackView.Size = new System.Drawing.Size(784, 372);
             this.videoTrackView.TabIndex = 0;
             // 
             // TPAudio
@@ -203,7 +199,7 @@ namespace CMkvPropEdit
             this.TPAudio.Location = new System.Drawing.Point(4, 22);
             this.TPAudio.Name = "TPAudio";
             this.TPAudio.Padding = new System.Windows.Forms.Padding(3);
-            this.TPAudio.Size = new System.Drawing.Size(790, 380);
+            this.TPAudio.Size = new System.Drawing.Size(790, 378);
             this.TPAudio.TabIndex = 3;
             this.TPAudio.Text = "Audio";
             this.TPAudio.UseVisualStyleBackColor = true;
@@ -211,14 +207,11 @@ namespace CMkvPropEdit
             // audioTrackView
             // 
             this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.audioTrackView.IsDefaultEnabled = false;
             this.audioTrackView.IsDefaultTrackChildEnabled = false;
-            this.audioTrackView.IsDefaultTrackEnabled = false;
             this.audioTrackView.IsForcedTrackChildEnabled = false;
-            this.audioTrackView.IsForcedTrackEnabled = false;
             this.audioTrackView.Location = new System.Drawing.Point(3, 3);
             this.audioTrackView.Name = "audioTrackView";
-            this.audioTrackView.Size = new System.Drawing.Size(784, 374);
+            this.audioTrackView.Size = new System.Drawing.Size(784, 372);
             this.audioTrackView.TabIndex = 0;
             // 
             // TPSubtitles
@@ -227,7 +220,7 @@ namespace CMkvPropEdit
             this.TPSubtitles.Location = new System.Drawing.Point(4, 22);
             this.TPSubtitles.Name = "TPSubtitles";
             this.TPSubtitles.Padding = new System.Windows.Forms.Padding(3);
-            this.TPSubtitles.Size = new System.Drawing.Size(790, 380);
+            this.TPSubtitles.Size = new System.Drawing.Size(790, 378);
             this.TPSubtitles.TabIndex = 4;
             this.TPSubtitles.Text = "Subtitles";
             this.TPSubtitles.UseVisualStyleBackColor = true;
@@ -235,14 +228,11 @@ namespace CMkvPropEdit
             // subtitleTrackView
             // 
             this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.subtitleTrackView.IsDefaultEnabled = false;
             this.subtitleTrackView.IsDefaultTrackChildEnabled = false;
-            this.subtitleTrackView.IsDefaultTrackEnabled = false;
             this.subtitleTrackView.IsForcedTrackChildEnabled = false;
-            this.subtitleTrackView.IsForcedTrackEnabled = false;
             this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
             this.subtitleTrackView.Name = "subtitleTrackView";
-            this.subtitleTrackView.Size = new System.Drawing.Size(784, 374);
+            this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
             this.subtitleTrackView.TabIndex = 0;
             // 
             // TPOptions
@@ -411,13 +401,24 @@ namespace CMkvPropEdit
             // 
             // TPOutput
             // 
+            this.TPOutput.Controls.Add(this.RTxtOutput);
             this.TPOutput.Location = new System.Drawing.Point(4, 22);
             this.TPOutput.Name = "TPOutput";
             this.TPOutput.Padding = new System.Windows.Forms.Padding(3);
-            this.TPOutput.Size = new System.Drawing.Size(790, 380);
+            this.TPOutput.Size = new System.Drawing.Size(790, 378);
             this.TPOutput.TabIndex = 5;
             this.TPOutput.Text = "Output";
             this.TPOutput.UseVisualStyleBackColor = true;
+            // 
+            // RTxtOutput
+            // 
+            this.RTxtOutput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RTxtOutput.Location = new System.Drawing.Point(3, 3);
+            this.RTxtOutput.Name = "RTxtOutput";
+            this.RTxtOutput.ReadOnly = true;
+            this.RTxtOutput.Size = new System.Drawing.Size(784, 372);
+            this.RTxtOutput.TabIndex = 0;
+            this.RTxtOutput.Text = "";
             // 
             // BtnProcessFiles
             // 
@@ -457,6 +458,7 @@ namespace CMkvPropEdit
             this.TPSubtitles.ResumeLayout(false);
             this.TPOptions.ResumeLayout(false);
             this.TPOptions.PerformLayout();
+            this.TPOutput.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -491,10 +493,11 @@ namespace CMkvPropEdit
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button BtnOptionRenamePreset;
         private System.Windows.Forms.Button BtnOptionDeletePreset;
-        private TrackInfoView videoTrackView;
-        private TrackInfoView audioTrackView;
-        private TrackInfoView subtitleTrackView;
+        private CMkvPropEdit.CustomControls.TrackInfoView videoTrackView;
+        private CMkvPropEdit.CustomControls.TrackInfoView audioTrackView;
+        private CMkvPropEdit.CustomControls.TrackInfoView subtitleTrackView;
         private System.Windows.Forms.ProgressBar PgLoading;
+        private System.Windows.Forms.RichTextBox RTxtOutput;
     }
 }
 

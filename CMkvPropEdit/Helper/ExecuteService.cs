@@ -284,7 +284,7 @@ namespace CMkvPropEdit.Helper
             return attachmentDelete.ToString();
         }
 
-        internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action update)
+        internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action<string, string> update)
         {
             //string[] cmdLineGeneralOpt = SetCmdLineGeneral(generalInfo, fileNames);
             string[] cmdLineVideoOpt = SetCmdLineTrack(videoInfo, fileNames);
@@ -309,7 +309,7 @@ namespace CMkvPropEdit.Helper
             ExecuteBatch(cmdLineBatchOpt, fileNames, update);
         }
 
-        private static void ExecuteBatch(string[] cmdLineBatchOpt, string[] filesNames, Action update)
+        private static void ExecuteBatch(string[] cmdLineBatchOpt, string[] filesNames, Action<string, string> update)
         {
             Thread thread = new Thread(()=>
             {
@@ -322,13 +322,16 @@ namespace CMkvPropEdit.Helper
                             StartInfo = new System.Diagnostics.ProcessStartInfo
                             {
                                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                                RedirectStandardOutput = true,
+                                UseShellExecute = false,
                                 FileName = Properties.Settings.Default.MKVPropeditPath,
                                 Arguments = cmdLineBatchOpt[i]
                             }
                         };
                         process.Start();
+                        string output = process.StandardOutput.ReadToEnd();
                         process.WaitForExit();
-                        update();
+                        update(cmdLineBatchOpt[i], output);
                     }
                 }
                 catch (Exception ex)

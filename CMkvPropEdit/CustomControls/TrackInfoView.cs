@@ -8,8 +8,8 @@ namespace CMkvPropEdit.CustomControls
 {
     public partial class TrackInfoView : UserControl
     {
-        private readonly TrackType Type;
-        private readonly string DefaultTrackName;
+        private TrackType Type;
+        private string DefaultTrackName;
         private List<TrackInfo> trackInfos;
         internal List<TrackInfo> TrackInfos
         {
@@ -30,6 +30,7 @@ namespace CMkvPropEdit.CustomControls
         }
         private TrackInfo SelectedTrack;
 
+        #region ugly code; have to find a better solution. Maybe just do it with OnChange instead of bindings
         public bool IsDefaultEnabled {
             get
             {
@@ -75,7 +76,8 @@ namespace CMkvPropEdit.CustomControls
             }
             set
             {
-                isForcedTrackChildEnabled = SelectedTrack.IsEnabled && SelectedTrack.ForcedTrack.IsEnabled;
+                if (SelectedTrack != null) //I hate you Form Designer; JUST DON'T SET IT!!!!
+                    isForcedTrackChildEnabled = SelectedTrack.IsEnabled && SelectedTrack.ForcedTrack.IsEnabled;
             }
         }
         private bool isDefaultTrackChildEnabled;
@@ -87,14 +89,20 @@ namespace CMkvPropEdit.CustomControls
             }
             set
             {
-                isDefaultTrackChildEnabled = SelectedTrack.IsEnabled && SelectedTrack.DefaultTrack.IsEnabled;
+                if(SelectedTrack != null) //I hate you Form Designer; JUST DON'T SET IT!!!!
+                    isDefaultTrackChildEnabled = SelectedTrack.IsEnabled && SelectedTrack.DefaultTrack.IsEnabled;
             }
         }
+        #endregion
 
-        internal TrackInfoView(TrackType type)
+        public TrackInfoView()
         {
             InitializeComponent();
             TrackInfos = new List<TrackInfo>();
+        }
+
+        internal void SetType(TrackType type)
+        {
             Type = type;
             switch (type)
             {
@@ -115,7 +123,6 @@ namespace CMkvPropEdit.CustomControls
             CmBLanguage.DataSource = new BindingSource(StaticData.Languages, null);
             CmBLanguage.DisplayMember = "value";
             CmBLanguage.ValueMember = "key";
-            
             BtnAdd_Click(null, null);
         }
 
