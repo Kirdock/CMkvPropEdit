@@ -13,27 +13,15 @@ namespace CMkvPropEdit.Helper
 {
     static class ExecuteService
     {
-        private static string EscapeBackslashes(string text)
-        {
-            return text;
-        }
-
         private static string PadNumber(int pad, int number)
         {
             int numberLength = number.ToString().Length;
             return new string('0', pad - numberLength) + number;
         }
 
-        private static string EscapeName(string text)
-        {
-            //return text.Replace("\"", "####escaped__quotes#####").Replace("\\", "\\\\");
-            return text;
-        }
-
         private static string[] SetCmdLineGeneral(GeneralInfo info, string[] fileNames)
         {
             string[] cmdLineGeneralOpt = new string[fileNames.Length];
-            int currentNumber = info.TrackNameAndNumber.Numbering.Start;
 
             for (int i = 0; i < fileNames.Length; i++)
             {
@@ -47,12 +35,12 @@ namespace CMkvPropEdit.Helper
                         case ModifyAction.ActionType.From:
                             if (!string.IsNullOrWhiteSpace(info.Tags.FilePath))
                             {
-                                builder.Append('\"').Append(EscapeName(info.Tags.FilePath)).Append('\"');
+                                builder.Append($"\"{info.Tags.FilePath}\"");
                             }
                             break;
                         case ModifyAction.ActionType.Match:
                             string tmpTags = Path.GetFileNameWithoutExtension(fileNames[i]) + info.Tags.Match.Text + info.Tags.Match.Extension;
-                            builder.Append('\"').Append(EscapeName(tmpTags)).Append('\"');
+                            builder.Append($"\"{tmpTags}\"");
                             break;
 
                         default:
@@ -60,7 +48,7 @@ namespace CMkvPropEdit.Helper
                     }
                 }
 
-                if (info.Tags.IsEnabled)
+                if (info.Chapters.IsEnabled)
                 {
                     builder.Append(" --chapters ");
                     switch (info.Chapters.Action)
@@ -75,14 +63,14 @@ namespace CMkvPropEdit.Helper
                             }
                             else
                             {
-                                builder.Append('\"').Append(EscapeName(info.Chapters.FilePath)).Append('\"');
+                                builder.Append($"\"{info.Chapters.FilePath}\"");
                             }
                             break;
                         case ModifyAction.ActionType.Match:
                             string tmpChaps = Path.GetFileNameWithoutExtension(fileNames[i]) +
                                               info.Chapters.Match.Text + info.Chapters.Match.Extension;
 
-                            builder.Append('\"').Append(EscapeName(tmpChaps)).Append('\"');
+                            builder.Append($"\"{tmpChaps}\"");
                             break;
                     }
                 }
@@ -95,21 +83,17 @@ namespace CMkvPropEdit.Helper
 
                     if (info.TrackNameAndNumber.Numbering.IsEnabled)
                     {
-                        int pad = 0;
-                        pad = info.TrackNameAndNumber.Numbering.Padding;
-                        newTitle = newTitle.Replace("{num}", PadNumber(pad, currentNumber));
-
-                        currentNumber++;
+                        newTitle = newTitle.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + i));
                     }
 
                     newTitle = newTitle.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileNames[i]));
 
-                    builder.Append(" --set title=\"").Append(EscapeName(newTitle)).Append('\"');
+                    builder.Append($" --set title=\"{newTitle}\"");
                 }
 
                 if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
                 {
-                    builder.Append(" ").Append(EscapeName(info.Parameters.Text));
+                    builder.Append(" ").Append(info.Parameters.Text);
                 }
                 cmdLineGeneralOpt[i] = builder.ToString();
             }
@@ -119,24 +103,18 @@ namespace CMkvPropEdit.Helper
         private static string[] SetCmdLineTrack(TrackInfo[] infos, string[] fileNames)
         {
             string[] cmdLineOpt = new string[fileNames.Length];
-            string[] tmpCmdLineOpt = new string[infos.Length];
-            int[] numStart = new int[infos.Length];
-            int[] numPad = new int[infos.Length];
 
             for (int i = 0; i < fileNames.Length; i++)
             {
-                cmdLineOpt[i] = "";
+                StringBuilder fileCmd = new StringBuilder();
 
                 for (int j = 0; j < infos.Length; j++)
                 {
                     TrackInfo info = infos[j];
-                    tmpCmdLineOpt[j] = "";
+                    
+                    StringBuilder builder = new StringBuilder();
                     if (info.IsEnabled)
                     {
-                        numStart[j] = info.TrackNameAndNumber.Numbering.Start;
-                        numPad[j] = info.TrackNameAndNumber.Numbering.Padding;
-                        StringBuilder builder = new StringBuilder();
-
                         if (info.DefaultTrack.IsEnabled)
                         {
                             builder.Append(" --set flag-default=").Append(info.DefaultTrack.Value ? '1' : '0');
@@ -149,44 +127,32 @@ namespace CMkvPropEdit.Helper
 
                         if (info.TrackNameAndNumber.TrackName.IsEnabled)
                         {
-                            builder.Append(" --set name=\"").Append(EscapeName(info.TrackNameAndNumber.TrackName.Text)).Append("\"");
+                            string text = info.TrackNameAndNumber.TrackName.Text.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileNames[i]));
+                            if (info.TrackNameAndNumber.TrackName.IsEnabled && info.TrackNameAndNumber.Numbering.IsEnabled)
+                            {
+                                text = text.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + i));
+                            }
+                            builder.Append($" --set name=\"{text}\"");
                         }
                         
                         if (info.Language.IsEnabled)
                         {
-                            builder.Append(" --set language=\"").Append(info.Language.Text).Append("\"");
+                            builder.Append($" --set language=\"{info.Language.Text}\"");
                         }
 
                         if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
                         {
-                            builder.Append(" ").Append(EscapeBackslashes(info.Parameters.Text));
+                            builder.Append(" ").Append(info.Parameters.Text);
                         }
 
                         if (builder.Length != 0)
                         {
-                            tmpCmdLineOpt[j] = $" --edit track:{info.Type}" + (j + 1) + builder.ToString();
+                            builder.Insert(0, $" --edit track:{info.Type}{j + 1}");
                         }
                     }
+                    fileCmd.Append(builder);
                 }
-            }
-
-            for (int i = 0; i < infos.Length; i++)
-            {
-                TrackInfo info = infos[i];
-                for (int j = 0; j < fileNames.Length; j++)
-                {
-                    string tmpText2 = tmpCmdLineOpt[i];
-
-                    if (info.TrackNameAndNumber.TrackName.IsEnabled && info.TrackNameAndNumber.Numbering.IsEnabled)
-                    {
-                        tmpText2 = tmpText2.Replace("{num}", PadNumber(numPad[i], numStart[i]));
-                        numStart[i]++;
-                    }
-
-                    tmpText2 = tmpText2.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileNames[j]));
-
-                    cmdLineOpt[j] += tmpText2;
-                }
+                cmdLineOpt[i] = fileCmd.ToString();
             }
             return cmdLineOpt;
         }
@@ -203,33 +169,33 @@ namespace CMkvPropEdit.Helper
                 string mime = row[3].ToString();
 
 
-                SetMeta(name, desc, mime, attachments);
-                attachments.Append(" --add-attachment \"").Append(EscapeName(file)).Append('\"');
+                SetAttachmentMeta(name, desc, mime, attachments);
+                attachments.Append($" --add-attachment \"{file}\"");
             }
             return attachments.ToString();
         }
 
-        private static void SetMeta(string name, string desc, string mime, StringBuilder builder)
+        private static void SetAttachmentMeta(string name, string desc, string mime, StringBuilder builder)
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
-                builder.Append(" --attachment-name \"").Append(EscapeName(name)).Append('\"');
+                builder.Append($" --attachment-name \"{name}\"");
             }
 
             if (!string.IsNullOrWhiteSpace(mime))
             {
-                builder.Append(" --attachment-description \"").Append(EscapeName(desc)).Append('\"');
+                builder.Append($" --attachment-description \"{desc}\"");
             }
 
             if (!string.IsNullOrWhiteSpace(desc))
             {
-                builder.Append(" --attachment-mime-type \"").Append(EscapeName(mime)).Append('\"');
+                builder.Append($" --attachment-mime-type \"{mime}\"");
             }
         }
 
         private static string SetCmdLineAttachmentsReplace(DataTable table)
         {
-            StringBuilder attachmentsDelete = new StringBuilder();
+            StringBuilder attachmentsReplace = new StringBuilder();
 
             foreach(DataRow row in table.AsEnumerable())
             {
@@ -241,22 +207,22 @@ namespace CMkvPropEdit.Helper
                 string mime = row[5].ToString();
 
 
-                SetMeta(name, desc, mime, attachmentsDelete);
+                SetAttachmentMeta(name, desc, mime, attachmentsReplace);
 
                 switch (type)
                 {
                     case AttachmentType.Name:
-                        attachmentsDelete.Append(" --replace-attachment \"name:").Append(EscapeName(orig)).Append(':').Append(EscapeName(replace)).Append('\"');
+                        attachmentsReplace.Append($" --replace-attachment \"name:{orig}:{replace}\"");
                         break;
                     case AttachmentType.Id:
-                        attachmentsDelete.Append(" --replace-attachment \"").Append(orig).Append(':').Append(EscapeName(replace)).Append('\"');
+                        attachmentsReplace.Append($" --replace-attachment \"{orig}:{replace}\"");
                         break;
                     case AttachmentType.Type:
-                        attachmentsDelete.Append(" --replace-attachment \"mime-type:").Append(EscapeName(orig)).Append(':').Append(EscapeName(replace)).Append('\"');
+                        attachmentsReplace.Append($" --replace-attachment \"mime-type:{orig}:{replace}\"");
                         break;
                 }
             }
-            return attachmentsDelete.ToString();
+            return attachmentsReplace.ToString();
         }
 
         private static string SetCmdLineAttachmentsDelete(DataTable table)
@@ -271,13 +237,13 @@ namespace CMkvPropEdit.Helper
                 switch (type)
                 {
                     case AttachmentType.Name:
-                        attachmentDelete.Append(" --delete-attachment \"name:").Append(EscapeName(value)).Append('\"');
+                        attachmentDelete.Append(" --delete-attachment \"name:{value}\"");
                         break;
                     case AttachmentType.Id:
-                        attachmentDelete.Append(" --delete-attachment \"").Append(value).Append('\"');
+                        attachmentDelete.Append($" --delete-attachment \"{value}\"");
                         break;
                     case AttachmentType.Type:
-                        attachmentDelete.Append(" --delete-attachment \"mime-type:").Append(EscapeName(value)).Append('\"');
+                        attachmentDelete.Append($" --delete-attachment \"mime-type:{value}\"");
                         break;
                 }
             }
@@ -303,7 +269,7 @@ namespace CMkvPropEdit.Helper
                 //        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
                 string cmdLineAllOpt = cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
 
-                cmdLineBatchOpt[i] = "\"" + EscapeName(fileNames[i]) + "\"" + cmdLineAllOpt;
+                cmdLineBatchOpt[i] = "\"" + fileNames[i] + "\"" + cmdLineAllOpt;
             }
 
             ExecuteBatch(cmdLineBatchOpt, fileNames, update);

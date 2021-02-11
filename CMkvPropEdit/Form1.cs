@@ -195,7 +195,7 @@ namespace CMkvPropEdit
         private void BtnOptionSavePreset_Click(object sender, EventArgs e)
         {
             HashSet<string> fileNames = new HashSet<string>(SaveService.GetPresetNames());
-            using (InsertText form = new InsertText("Enter preset name", "Enter name",string.Empty, fileNames))
+            using (InsertText form = new InsertText("Enter preset name", "Enter name", permittedNames: fileNames))
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -211,7 +211,6 @@ namespace CMkvPropEdit
                             CmBOptionPresets.Items.Add(form.NewText);
                             MessageService.ShowInformation("Saved");
                         }
-                        
                     }
                 }
             }
@@ -223,7 +222,7 @@ namespace CMkvPropEdit
             {
                 string selectedPresetName = CmBOptionPresets.SelectedItem.ToString();
                 HashSet<string> permittedNames = new HashSet<string>(CmBOptionPresets.Items.Cast<string>().Where(preset => preset != selectedPresetName));
-                using (InsertText form = new InsertText("Rename preset name", "Enter name", selectedPresetName, permittedNames))
+                using (InsertText form = new InsertText("Rename preset name", "Enter name", selectedPresetName, permittedNames: permittedNames))
                 {
                     if (form.ShowDialog() == DialogResult.OK && selectedPresetName != form.NewText)
                     {
@@ -243,7 +242,17 @@ namespace CMkvPropEdit
             {
                 if (SaveService.DeletePreset(CmBOptionPresets.SelectedItem.ToString()))
                 {
+                    int index = CmBOptionPresets.SelectedIndex;
                     CmBOptionPresets.Items.RemoveAt(CmBOptionPresets.SelectedIndex);
+                    if (index > 1)
+                    {
+                        index--;
+                    }
+                    if (CmBOptionPresets.Items.Count != 0)
+                    {
+                        CmBOptionPresets.SelectedIndex = index;
+                    }
+                    MessageService.ShowInformation("Deleted");
                 }
             }
         }

@@ -37,11 +37,8 @@
             this.LBInput = new System.Windows.Forms.ListBox();
             this.TPGeneral = new System.Windows.Forms.TabPage();
             this.TPVideo = new System.Windows.Forms.TabPage();
-            this.videoTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPAudio = new System.Windows.Forms.TabPage();
-            this.audioTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPSubtitles = new System.Windows.Forms.TabPage();
-            this.subtitleTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPOptions = new System.Windows.Forms.TabPage();
             this.BtnOptionRenamePreset = new System.Windows.Forms.Button();
             this.BtnOptionDeletePreset = new System.Windows.Forms.Button();
@@ -61,6 +58,9 @@
             this.RTxtOutput = new System.Windows.Forms.RichTextBox();
             this.BtnProcessFiles = new System.Windows.Forms.Button();
             this.PgLoading = new System.Windows.Forms.ProgressBar();
+            this.videoTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
+            this.audioTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
+            this.subtitleTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.tabControl1.SuspendLayout();
             this.TPInput.SuspendLayout();
             this.TPVideo.SuspendLayout();
@@ -183,14 +183,6 @@
             this.TPVideo.Text = "Video";
             this.TPVideo.UseVisualStyleBackColor = true;
             // 
-            // videoTrackView
-            // 
-            this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.videoTrackView.Location = new System.Drawing.Point(3, 3);
-            this.videoTrackView.Name = "videoTrackView";
-            this.videoTrackView.Size = new System.Drawing.Size(784, 372);
-            this.videoTrackView.TabIndex = 0;
-            // 
             // TPAudio
             // 
             this.TPAudio.Controls.Add(this.audioTrackView);
@@ -202,14 +194,6 @@
             this.TPAudio.Text = "Audio";
             this.TPAudio.UseVisualStyleBackColor = true;
             // 
-            // audioTrackView
-            // 
-            this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.audioTrackView.Location = new System.Drawing.Point(3, 3);
-            this.audioTrackView.Name = "audioTrackView";
-            this.audioTrackView.Size = new System.Drawing.Size(784, 372);
-            this.audioTrackView.TabIndex = 0;
-            // 
             // TPSubtitles
             // 
             this.TPSubtitles.Controls.Add(this.subtitleTrackView);
@@ -220,14 +204,6 @@
             this.TPSubtitles.TabIndex = 4;
             this.TPSubtitles.Text = "Subtitles";
             this.TPSubtitles.UseVisualStyleBackColor = true;
-            // 
-            // subtitleTrackView
-            // 
-            this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
-            this.subtitleTrackView.Name = "subtitleTrackView";
-            this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
-            this.subtitleTrackView.TabIndex = 0;
             // 
             // TPOptions
             // 
@@ -255,7 +231,8 @@
             // 
             // BtnOptionRenamePreset
             // 
-            this.BtnOptionRenamePreset.Location = new System.Drawing.Point(264, 135);
+            this.BtnOptionRenamePreset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOptionRenamePreset.Location = new System.Drawing.Point(627, 133);
             this.BtnOptionRenamePreset.Name = "BtnOptionRenamePreset";
             this.BtnOptionRenamePreset.Size = new System.Drawing.Size(75, 23);
             this.BtnOptionRenamePreset.TabIndex = 15;
@@ -265,7 +242,8 @@
             // 
             // BtnOptionDeletePreset
             // 
-            this.BtnOptionDeletePreset.Location = new System.Drawing.Point(345, 135);
+            this.BtnOptionDeletePreset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOptionDeletePreset.Location = new System.Drawing.Point(708, 133);
             this.BtnOptionDeletePreset.Name = "BtnOptionDeletePreset";
             this.BtnOptionDeletePreset.Size = new System.Drawing.Size(75, 23);
             this.BtnOptionDeletePreset.TabIndex = 14;
@@ -275,7 +253,8 @@
             // 
             // BtnOptionSavePreset
             // 
-            this.BtnOptionSavePreset.Location = new System.Drawing.Point(264, 106);
+            this.BtnOptionSavePreset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOptionSavePreset.Location = new System.Drawing.Point(627, 104);
             this.BtnOptionSavePreset.Name = "BtnOptionSavePreset";
             this.BtnOptionSavePreset.Size = new System.Drawing.Size(75, 23);
             this.BtnOptionSavePreset.TabIndex = 13;
@@ -285,7 +264,8 @@
             // 
             // BtnOptionLoadPreset
             // 
-            this.BtnOptionLoadPreset.Location = new System.Drawing.Point(345, 106);
+            this.BtnOptionLoadPreset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOptionLoadPreset.Location = new System.Drawing.Point(709, 104);
             this.BtnOptionLoadPreset.Name = "BtnOptionLoadPreset";
             this.BtnOptionLoadPreset.Size = new System.Drawing.Size(75, 23);
             this.BtnOptionLoadPreset.TabIndex = 12;
@@ -295,11 +275,14 @@
             // 
             // CmBOptionPresets
             // 
+            this.CmBOptionPresets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.CmBOptionPresets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CmBOptionPresets.FormattingEnabled = true;
             this.CmBOptionPresets.Location = new System.Drawing.Point(137, 106);
             this.CmBOptionPresets.Name = "CmBOptionPresets";
-            this.CmBOptionPresets.Size = new System.Drawing.Size(121, 21);
+            this.CmBOptionPresets.Size = new System.Drawing.Size(484, 21);
+            this.CmBOptionPresets.Sorted = true;
             this.CmBOptionPresets.TabIndex = 11;
             // 
             // label3
@@ -416,8 +399,8 @@
             // 
             // BtnProcessFiles
             // 
-            this.BtnProcessFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnProcessFiles.Location = new System.Drawing.Point(367, 403);
+            this.BtnProcessFiles.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.BtnProcessFiles.Location = new System.Drawing.Point(367, 409);
             this.BtnProcessFiles.Name = "BtnProcessFiles";
             this.BtnProcessFiles.Size = new System.Drawing.Size(75, 23);
             this.BtnProcessFiles.TabIndex = 1;
@@ -431,8 +414,32 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PgLoading.Location = new System.Drawing.Point(0, 438);
             this.PgLoading.Name = "PgLoading";
-            this.PgLoading.Size = new System.Drawing.Size(798, 23);
+            this.PgLoading.Size = new System.Drawing.Size(800, 23);
             this.PgLoading.TabIndex = 2;
+            // 
+            // videoTrackView
+            // 
+            this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.videoTrackView.Location = new System.Drawing.Point(3, 3);
+            this.videoTrackView.Name = "videoTrackView";
+            this.videoTrackView.Size = new System.Drawing.Size(784, 372);
+            this.videoTrackView.TabIndex = 0;
+            // 
+            // audioTrackView
+            // 
+            this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.audioTrackView.Location = new System.Drawing.Point(3, 3);
+            this.audioTrackView.Name = "audioTrackView";
+            this.audioTrackView.Size = new System.Drawing.Size(784, 372);
+            this.audioTrackView.TabIndex = 0;
+            // 
+            // subtitleTrackView
+            // 
+            this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
+            this.subtitleTrackView.Name = "subtitleTrackView";
+            this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
+            this.subtitleTrackView.TabIndex = 0;
             // 
             // Form1
             // 
