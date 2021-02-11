@@ -10,4 +10,4 @@ CMkvPropEdit is a C# variant of [JMkvpropedit](https://github.com/BrunoReX/jmkvp
 I do not know if I even finish this project
 
 # What is not working/implemented at the moment?
-- Everything except general-info and attachments
+- Everything regarding general-info and attachments
