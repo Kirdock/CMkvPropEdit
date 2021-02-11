@@ -68,6 +68,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBEditTrack.TabIndex = 0;
             this.CBEditTrack.Text = "Edit this track:";
             this.CBEditTrack.UseVisualStyleBackColor = true;
+            this.CBEditTrack.CheckedChanged += new System.EventHandler(this.CBEditTrack_CheckedChanged);
             // 
             // CmBTrack
             // 
@@ -108,6 +109,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBDefaultTrack.TabIndex = 4;
             this.CBDefaultTrack.Text = "Default track:";
             this.CBDefaultTrack.UseVisualStyleBackColor = true;
+            this.CBDefaultTrack.CheckedChanged += new System.EventHandler(this.CBDefaultTrack_CheckedChanged);
             // 
             // RBDefaultTrackYes
             // 
@@ -148,6 +150,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBTrackName.TabIndex = 8;
             this.CBTrackName.Text = "Track name:";
             this.CBTrackName.UseVisualStyleBackColor = true;
+            this.CBTrackName.CheckedChanged += new System.EventHandler(this.CBTrackName_CheckedChanged);
             // 
             // TxtTrackName
             // 
@@ -167,6 +170,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBNumbering.TabIndex = 10;
             this.CBNumbering.Text = "Numbering:";
             this.CBNumbering.UseVisualStyleBackColor = true;
+            this.CBNumbering.CheckedChanged += new System.EventHandler(this.CBNumbering_CheckedChanged);
             // 
             // label1
             // 
@@ -238,6 +242,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBLanguage.TabIndex = 16;
             this.CBLanguage.Text = "Language:";
             this.CBLanguage.UseVisualStyleBackColor = true;
+            this.CBLanguage.CheckedChanged += new System.EventHandler(this.CBLanguage_CheckedChanged);
             // 
             // CmBLanguage
             // 
@@ -257,6 +262,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBParameters.TabIndex = 18;
             this.CBParameters.Text = "Extra parameters:";
             this.CBParameters.UseVisualStyleBackColor = true;
+            this.CBParameters.CheckedChanged += new System.EventHandler(this.CBParameters_CheckedChanged);
             // 
             // TxtParameters
             // 
@@ -276,6 +282,7 @@ namespace CMkvPropEdit.CustomControls
             this.CBForcedTrack.TabIndex = 20;
             this.CBForcedTrack.Text = "Forced Track";
             this.CBForcedTrack.UseVisualStyleBackColor = true;
+            this.CBForcedTrack.CheckedChanged += new System.EventHandler(this.CBForcedTrack_CheckedChanged);
             // 
             // panel2
             // 

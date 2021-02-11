@@ -186,8 +186,6 @@
             // videoTrackView
             // 
             this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.videoTrackView.IsDefaultTrackChildEnabled = false;
-            this.videoTrackView.IsForcedTrackChildEnabled = false;
             this.videoTrackView.Location = new System.Drawing.Point(3, 3);
             this.videoTrackView.Name = "videoTrackView";
             this.videoTrackView.Size = new System.Drawing.Size(784, 372);
@@ -207,8 +205,6 @@
             // audioTrackView
             // 
             this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.audioTrackView.IsDefaultTrackChildEnabled = false;
-            this.audioTrackView.IsForcedTrackChildEnabled = false;
             this.audioTrackView.Location = new System.Drawing.Point(3, 3);
             this.audioTrackView.Name = "audioTrackView";
             this.audioTrackView.Size = new System.Drawing.Size(784, 372);
@@ -228,8 +224,6 @@
             // subtitleTrackView
             // 
             this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.subtitleTrackView.IsDefaultTrackChildEnabled = false;
-            this.subtitleTrackView.IsForcedTrackChildEnabled = false;
             this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
             this.subtitleTrackView.Name = "subtitleTrackView";
             this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
