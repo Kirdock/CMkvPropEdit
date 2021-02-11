@@ -10,4 +10,4 @@ CMkvPropEdit is a C# variant of JMkvpropedit or in other words a graphical inter
 I do not know if I even finish this project
 
 # What is not working/implemented at the moment?
-- Everything regarding general-info and attachments
+- Everything except general-info and attachments
