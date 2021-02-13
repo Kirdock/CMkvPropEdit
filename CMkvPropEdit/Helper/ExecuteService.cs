@@ -19,142 +19,130 @@ namespace CMkvPropEdit.Helper
             return new string('0', pad - numberLength) + number;
         }
 
-        private static string[] SetCmdLineGeneral(GeneralInfo info, string[] fileNames)
+        private static StringBuilder SetCmdLineGeneral(GeneralInfo info, string fileName, int index)
         {
-            string[] cmdLineGeneralOpt = new string[fileNames.Length];
+            StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < fileNames.Length; i++)
+            if (info.Tags.IsEnabled)
             {
-                StringBuilder builder = new StringBuilder();
-
-                if (info.Tags.IsEnabled)
+                builder.Append(" --tags all:");
+                switch (info.Tags.Action)
                 {
-                    builder.Append(" --tags all:");
-                    switch (info.Tags.Action)
-                    {
-                        case ModifyAction.ActionType.From:
-                            if (!string.IsNullOrWhiteSpace(info.Tags.FilePath))
-                            {
-                                builder.Append($"\"{info.Tags.FilePath}\"");
-                            }
-                            break;
-                        case ModifyAction.ActionType.Match:
-                            string tmpTags = Path.GetFileNameWithoutExtension(fileNames[i]) + info.Tags.Match.Text + info.Tags.Match.Extension;
-                            builder.Append($"\"{tmpTags}\"");
-                            break;
+                    case ModifyAction.ActionType.From:
+                        if (!string.IsNullOrWhiteSpace(info.Tags.FilePath))
+                        {
+                            builder.Append($"\"{info.Tags.FilePath}\"");
+                        }
+                        break;
+                    case ModifyAction.ActionType.Match:
+                        string tmpTags = Path.GetFileNameWithoutExtension(fileName) + info.Tags.Match.Text + info.Tags.Match.Extension;
+                        builder.Append($"\"{tmpTags}\"");
+                        break;
 
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
-
-                if (info.Chapters.IsEnabled)
-                {
-                    builder.Append(" --chapters ");
-                    switch (info.Chapters.Action)
-                    {
-                        case ModifyAction.ActionType.Remove:
-                            builder.Append("''");
-                            break;
-                        case ModifyAction.ActionType.From:
-                            if (string.IsNullOrWhiteSpace(info.Chapters.FilePath))
-                            {
-                                builder.Append("''");
-                            }
-                            else
-                            {
-                                builder.Append($"\"{info.Chapters.FilePath}\"");
-                            }
-                            break;
-                        case ModifyAction.ActionType.Match:
-                            string tmpChaps = Path.GetFileNameWithoutExtension(fileNames[i]) +
-                                              info.Chapters.Match.Text + info.Chapters.Match.Extension;
-
-                            builder.Append($"\"{tmpChaps}\"");
-                            break;
-                    }
-                }
-
-                if (info.TrackNameAndNumber.TrackName.IsEnabled)
-                {
-                    builder.Append(" --edit info");
-
-                    string newTitle = info.TrackNameAndNumber.TrackName.Text;
-
-                    if (info.TrackNameAndNumber.Numbering.IsEnabled)
-                    {
-                        newTitle = newTitle.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + i));
-                    }
-
-                    newTitle = newTitle.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileNames[i]));
-
-                    builder.Append($" --set title=\"{newTitle}\"");
-                }
-
-                if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
-                {
-                    builder.Append(" ").Append(info.Parameters.Text);
-                }
-                cmdLineGeneralOpt[i] = builder.ToString();
             }
-            return cmdLineGeneralOpt;
+
+            if (info.Chapters.IsEnabled)
+            {
+                builder.Append(" --chapters ");
+                switch (info.Chapters.Action)
+                {
+                    case ModifyAction.ActionType.Remove:
+                        builder.Append("''");
+                        break;
+                    case ModifyAction.ActionType.From:
+                        if (string.IsNullOrWhiteSpace(info.Chapters.FilePath))
+                        {
+                            builder.Append("''");
+                        }
+                        else
+                        {
+                            builder.Append($"\"{info.Chapters.FilePath}\"");
+                        }
+                        break;
+                    case ModifyAction.ActionType.Match:
+                        string tmpChaps = Path.GetFileNameWithoutExtension(fileName) +
+                                            info.Chapters.Match.Text + info.Chapters.Match.Extension;
+
+                        builder.Append($"\"{tmpChaps}\"");
+                        break;
+                }
+            }
+
+            if (info.TrackNameAndNumber.TrackName.IsEnabled)
+            {
+                builder.Append(" --edit info");
+
+                string newTitle = info.TrackNameAndNumber.TrackName.Text;
+
+                if (info.TrackNameAndNumber.Numbering.IsEnabled)
+                {
+                    newTitle = newTitle.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + index));
+                }
+
+                newTitle = newTitle.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileName));
+
+                builder.Append($" --set title=\"{newTitle}\"");
+            }
+
+            if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
+            {
+                builder.Append(" ").Append(info.Parameters.Text);
+            }
+            return builder;
         }
 
-        private static string[] SetCmdLineTrack(TrackInfo[] infos, string[] fileNames)
+        private static StringBuilder GetTrackLine(TrackInfo[] infos, string fileName, int index)
         {
-            string[] cmdLineOpt = new string[fileNames.Length];
+            StringBuilder fileCmd = new StringBuilder();
 
-            for (int i = 0; i < fileNames.Length; i++)
+            for (int j = 0; j < infos.Length; j++)
             {
-                StringBuilder fileCmd = new StringBuilder();
-
-                for (int j = 0; j < infos.Length; j++)
-                {
-                    TrackInfo info = infos[j];
+                TrackInfo info = infos[j];
                     
-                    StringBuilder builder = new StringBuilder();
-                    if (info.IsEnabled)
+                StringBuilder builder = new StringBuilder();
+                if (info.IsEnabled)
+                {
+                    if (info.DefaultTrack.IsEnabled)
                     {
-                        if (info.DefaultTrack.IsEnabled)
-                        {
-                            builder.Append(" --set flag-default=").Append(info.DefaultTrack.Value ? '1' : '0');
-                        }
-
-                        if (info.ForcedTrack.IsEnabled)
-                        {
-                            builder.Append(" --set flag-forced=").Append(info.ForcedTrack.Value ? '1' : '0');
-                        }
-
-                        if (info.TrackNameAndNumber.TrackName.IsEnabled)
-                        {
-                            string text = info.TrackNameAndNumber.TrackName.Text.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileNames[i]));
-                            if (info.TrackNameAndNumber.TrackName.IsEnabled && info.TrackNameAndNumber.Numbering.IsEnabled)
-                            {
-                                text = text.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + i));
-                            }
-                            builder.Append($" --set name=\"{text}\"");
-                        }
-                        
-                        if (info.Language.IsEnabled)
-                        {
-                            builder.Append($" --set language=\"{info.Language.Text}\"");
-                        }
-
-                        if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
-                        {
-                            builder.Append(" ").Append(info.Parameters.Text);
-                        }
-
-                        if (builder.Length != 0)
-                        {
-                            builder.Insert(0, $" --edit track:{info.Type}{j + 1}");
-                        }
+                        builder.Append(" --set flag-default=").Append(info.DefaultTrack.Value ? '1' : '0');
                     }
-                    fileCmd.Append(builder);
+
+                    if (info.ForcedTrack.IsEnabled)
+                    {
+                        builder.Append(" --set flag-forced=").Append(info.ForcedTrack.Value ? '1' : '0');
+                    }
+
+                    if (info.TrackNameAndNumber.TrackName.IsEnabled)
+                    {
+                        string text = info.TrackNameAndNumber.TrackName.Text.Replace("{file_name}", Path.GetFileNameWithoutExtension(fileName));
+                        if (info.TrackNameAndNumber.TrackName.IsEnabled && info.TrackNameAndNumber.Numbering.IsEnabled)
+                        {
+                            text = text.Replace("{num}", PadNumber(info.TrackNameAndNumber.Numbering.Padding, info.TrackNameAndNumber.Numbering.Start + index));
+                        }
+                        builder.Append($" --set name=\"{text}\"");
+                    }
+                        
+                    if (info.Language.IsEnabled)
+                    {
+                        builder.Append($" --set language=\"{info.Language.Text}\"");
+                    }
+
+                    if (info.Parameters.IsEnabled && !string.IsNullOrWhiteSpace(info.Parameters.Text))
+                    {
+                        builder.Append(" ").Append(info.Parameters.Text);
+                    }
+
+                    if (builder.Length != 0)
+                    {
+                        builder.Insert(0, $" --edit track:{info.Type}{j + 1}");
+                    }
                 }
-                cmdLineOpt[i] = fileCmd.ToString();
+                fileCmd.Append(builder);
             }
-            return cmdLineOpt;
+            return fileCmd;
         }
 
         private static string SetCmdLineAttachmentsAdd(DataTable table)
@@ -253,36 +241,22 @@ namespace CMkvPropEdit.Helper
         internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action<string, string> update)
         {
             //string[] cmdLineGeneralOpt = SetCmdLineGeneral(generalInfo, fileNames);
-            string[] cmdLineVideoOpt = SetCmdLineTrack(videoInfo, fileNames);
-            string[] cmdLineAudioOpt = SetCmdLineTrack(audioInfo, fileNames);
-            string[] cmdLineSubtitleOpt = SetCmdLineTrack(subtitleInfo, fileNames);
-            
+
             //string cmdLineAttachmentsAddOpt = SetCmdLineAttachmentsAdd(attachments.AddTable);
             //string cmdLineAttachmentsDeleteOpt = SetCmdLineAttachmentsReplace(attachments.ReplaceTable);
             //string cmdLineAttachmentsReplaceOpt = SetCmdLineAttachmentsDelete(attachments.DeleteTable);
 
-            string[] cmdLineBatchOpt = new string[fileNames.Length];
-
-            for (int i = 0; i < fileNames.Length; i++)
-            {
-                //string cmdLineAllOpt = cmdLineGeneralOpt[i] + cmdLineAttachmentsDeleteOpt + cmdLineAttachmentsAddOpt
-                //        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
-                string cmdLineAllOpt = cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
-
-                cmdLineBatchOpt[i] = "\"" + fileNames[i] + "\"" + cmdLineAllOpt;
-            }
-
-            ExecuteBatch(cmdLineBatchOpt, fileNames, update);
-        }
-
-        private static void ExecuteBatch(string[] cmdLineBatchOpt, string[] filesNames, Action<string, string> update)
-        {
-            Thread thread = new Thread(()=>
+            Thread thread = new Thread(() =>
             {
                 try
                 {
-                    for (int i = 0; i < cmdLineBatchOpt.Length; i++)
+                    for (int i = 0; i < fileNames.Length; i++)
                     {
+                        string fileName = fileNames[i];
+                        //string cmdLineAllOpt = cmdLineGeneralOpt[i] + cmdLineAttachmentsDeleteOpt + cmdLineAttachmentsAddOpt
+                        //        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
+
+                        string command = $"\"{fileName}\"" + GetTrackLine(videoInfo, fileName, i) + GetTrackLine(audioInfo, fileName, i) + GetTrackLine(subtitleInfo, fileName, i);
                         System.Diagnostics.Process process = new System.Diagnostics.Process
                         {
                             StartInfo = new System.Diagnostics.ProcessStartInfo
@@ -291,13 +265,13 @@ namespace CMkvPropEdit.Helper
                                 RedirectStandardOutput = true,
                                 UseShellExecute = false,
                                 FileName = Properties.Settings.Default.MKVPropeditPath,
-                                Arguments = cmdLineBatchOpt[i]
+                                Arguments = command
                             }
                         };
                         process.Start();
                         string output = process.StandardOutput.ReadToEnd();
                         process.WaitForExit();
-                        update(cmdLineBatchOpt[i], output);
+                        update(command, output);
                     }
                 }
                 catch (Exception ex)
@@ -307,10 +281,6 @@ namespace CMkvPropEdit.Helper
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
-           
         }
-
-
-
     }
 }
