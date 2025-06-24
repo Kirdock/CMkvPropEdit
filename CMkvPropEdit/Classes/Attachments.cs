@@ -6,42 +6,15 @@ namespace CMkvPropEdit.Classes
     [Serializable]
     class Attachments
     {
-        public DataTable AddTable;
-        public DataTable ReplaceTable;
-        public DataTable DeleteTable;
+        public AddAttachment[] AddAttachments;
+        public ReplaceAttachment[] ReplaceAttachments;
+        public DeleteAttachment[] DeleteAttachments;
 
         internal Attachments()
         {
-            InitAddTable();
-            InitReplaceTable();
-            InitDeleteTable();
-        }
-
-        private void InitAddTable()
-        {
-            AddTable = new DataTable("AttachmentAdd");
-            AddTable.Columns.Add("File", typeof(string));
-            AddTable.Columns.Add("Name", typeof(string));
-            AddTable.Columns.Add("Description", typeof(string));
-            AddTable.Columns.Add("MIME Type", typeof(string)); //combobox
-        }
-
-        private void InitReplaceTable()
-        {
-            ReplaceTable = new DataTable("AttachmentReplace");
-            ReplaceTable.Columns.Add("Type", typeof(AttachmentType));
-            ReplaceTable.Columns.Add("Original Value", typeof(string));
-            ReplaceTable.Columns.Add("Replacement", typeof(string)); //File
-            ReplaceTable.Columns.Add("Name", typeof(string));
-            ReplaceTable.Columns.Add("Description", typeof(string));
-            ReplaceTable.Columns.Add("MIME Type", typeof(string)); //combobox
-        }
-
-        private void InitDeleteTable()
-        {
-            DeleteTable = new DataTable("AttachmentDelete");
-            DeleteTable.Columns.Add("Type", typeof(AttachmentType));
-            DeleteTable.Columns.Add("Value", typeof(string)); //combobox
+            AddAttachments = new AddAttachment[0];
+            ReplaceAttachments = new ReplaceAttachment[0];
+            DeleteAttachments = new DeleteAttachment[0];
         }
     }
 
@@ -50,5 +23,35 @@ namespace CMkvPropEdit.Classes
         Name,
         Id,
         Type
+    }
+
+    [Serializable]
+    class AddAttachment
+    {
+        public string File { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        [System.ComponentModel.DisplayName("MIME Type")]
+        public string MimeType { get; set; } //combobox
+    }
+
+    [Serializable]
+    class ReplaceAttachment
+    {
+        public AttachmentType Type { get; set; } //Depending on the type the value is string, integer or MimeType (combobox)
+        [System.ComponentModel.DisplayName("Original value")]
+        public string Value { get; set; } //Cell type depends on AttachmentType
+        public string Replacement { get; set; } //File
+        public string Name { get; set; }
+        public string Description { get; set; }
+        [System.ComponentModel.DisplayName("MIME Type")]
+        public string MimeType { get; set; } //combobox
+    }
+
+    [Serializable]
+    class DeleteAttachment
+    {
+        public AttachmentType Type { get; set; }
+        public string Value { get; set; } //combobox
     }
 }

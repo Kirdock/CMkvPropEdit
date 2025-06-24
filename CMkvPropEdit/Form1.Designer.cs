@@ -37,8 +37,12 @@
             this.LBInput = new System.Windows.Forms.ListBox();
             this.TPGeneral = new System.Windows.Forms.TabPage();
             this.TPVideo = new System.Windows.Forms.TabPage();
+            this.videoTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPAudio = new System.Windows.Forms.TabPage();
+            this.audioTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
             this.TPSubtitles = new System.Windows.Forms.TabPage();
+            this.subtitleTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
+            this.TPAttachments = new System.Windows.Forms.TabPage();
             this.TPOptions = new System.Windows.Forms.TabPage();
             this.BtnOptionRenamePreset = new System.Windows.Forms.Button();
             this.BtnOptionDeletePreset = new System.Windows.Forms.Button();
@@ -58,14 +62,15 @@
             this.RTxtOutput = new System.Windows.Forms.RichTextBox();
             this.BtnProcessFiles = new System.Windows.Forms.Button();
             this.PgLoading = new System.Windows.Forms.ProgressBar();
-            this.videoTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
-            this.audioTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
-            this.subtitleTrackView = new CMkvPropEdit.CustomControls.TrackInfoView();
+            this.generalInfoView1 = new CMkvPropEdit.CustomControls.GeneralInfoView();
+            this.attachmentView1 = new CMkvPropEdit.CustomControls.AttachmentView();
             this.tabControl1.SuspendLayout();
             this.TPInput.SuspendLayout();
+            this.TPGeneral.SuspendLayout();
             this.TPVideo.SuspendLayout();
             this.TPAudio.SuspendLayout();
             this.TPSubtitles.SuspendLayout();
+            this.TPAttachments.SuspendLayout();
             this.TPOptions.SuspendLayout();
             this.TPOutput.SuspendLayout();
             this.SuspendLayout();
@@ -80,6 +85,7 @@
             this.tabControl1.Controls.Add(this.TPVideo);
             this.tabControl1.Controls.Add(this.TPAudio);
             this.tabControl1.Controls.Add(this.TPSubtitles);
+            this.tabControl1.Controls.Add(this.TPAttachments);
             this.tabControl1.Controls.Add(this.TPOptions);
             this.tabControl1.Controls.Add(this.TPOutput);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -164,6 +170,7 @@
             // 
             // TPGeneral
             // 
+            this.TPGeneral.Controls.Add(this.generalInfoView1);
             this.TPGeneral.Location = new System.Drawing.Point(4, 22);
             this.TPGeneral.Name = "TPGeneral";
             this.TPGeneral.Padding = new System.Windows.Forms.Padding(3);
@@ -183,6 +190,14 @@
             this.TPVideo.Text = "Video";
             this.TPVideo.UseVisualStyleBackColor = true;
             // 
+            // videoTrackView
+            // 
+            this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.videoTrackView.Location = new System.Drawing.Point(3, 3);
+            this.videoTrackView.Name = "videoTrackView";
+            this.videoTrackView.Size = new System.Drawing.Size(784, 372);
+            this.videoTrackView.TabIndex = 0;
+            // 
             // TPAudio
             // 
             this.TPAudio.Controls.Add(this.audioTrackView);
@@ -194,6 +209,14 @@
             this.TPAudio.Text = "Audio";
             this.TPAudio.UseVisualStyleBackColor = true;
             // 
+            // audioTrackView
+            // 
+            this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.audioTrackView.Location = new System.Drawing.Point(3, 3);
+            this.audioTrackView.Name = "audioTrackView";
+            this.audioTrackView.Size = new System.Drawing.Size(784, 372);
+            this.audioTrackView.TabIndex = 0;
+            // 
             // TPSubtitles
             // 
             this.TPSubtitles.Controls.Add(this.subtitleTrackView);
@@ -204,6 +227,24 @@
             this.TPSubtitles.TabIndex = 4;
             this.TPSubtitles.Text = "Subtitles";
             this.TPSubtitles.UseVisualStyleBackColor = true;
+            // 
+            // subtitleTrackView
+            // 
+            this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
+            this.subtitleTrackView.Name = "subtitleTrackView";
+            this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
+            this.subtitleTrackView.TabIndex = 0;
+            // 
+            // TPAttachments
+            // 
+            this.TPAttachments.Controls.Add(this.attachmentView1);
+            this.TPAttachments.Location = new System.Drawing.Point(4, 22);
+            this.TPAttachments.Name = "TPAttachments";
+            this.TPAttachments.Size = new System.Drawing.Size(790, 378);
+            this.TPAttachments.TabIndex = 7;
+            this.TPAttachments.Text = "Attachments";
+            this.TPAttachments.UseVisualStyleBackColor = true;
             // 
             // TPOptions
             // 
@@ -417,29 +458,21 @@
             this.PgLoading.Size = new System.Drawing.Size(800, 23);
             this.PgLoading.TabIndex = 2;
             // 
-            // videoTrackView
+            // generalInfoView1
             // 
-            this.videoTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.videoTrackView.Location = new System.Drawing.Point(3, 3);
-            this.videoTrackView.Name = "videoTrackView";
-            this.videoTrackView.Size = new System.Drawing.Size(784, 372);
-            this.videoTrackView.TabIndex = 0;
+            this.generalInfoView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.generalInfoView1.Location = new System.Drawing.Point(3, 3);
+            this.generalInfoView1.Name = "generalInfoView1";
+            this.generalInfoView1.Size = new System.Drawing.Size(784, 372);
+            this.generalInfoView1.TabIndex = 0;
             // 
-            // audioTrackView
+            // attachmentView1
             // 
-            this.audioTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.audioTrackView.Location = new System.Drawing.Point(3, 3);
-            this.audioTrackView.Name = "audioTrackView";
-            this.audioTrackView.Size = new System.Drawing.Size(784, 372);
-            this.audioTrackView.TabIndex = 0;
-            // 
-            // subtitleTrackView
-            // 
-            this.subtitleTrackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.subtitleTrackView.Location = new System.Drawing.Point(3, 3);
-            this.subtitleTrackView.Name = "subtitleTrackView";
-            this.subtitleTrackView.Size = new System.Drawing.Size(784, 372);
-            this.subtitleTrackView.TabIndex = 0;
+            this.attachmentView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.attachmentView1.Location = new System.Drawing.Point(0, 0);
+            this.attachmentView1.Name = "attachmentView1";
+            this.attachmentView1.Size = new System.Drawing.Size(790, 378);
+            this.attachmentView1.TabIndex = 0;
             // 
             // Form1
             // 
@@ -454,9 +487,11 @@
             this.Text = "CMkvPropEdit";
             this.tabControl1.ResumeLayout(false);
             this.TPInput.ResumeLayout(false);
+            this.TPGeneral.ResumeLayout(false);
             this.TPVideo.ResumeLayout(false);
             this.TPAudio.ResumeLayout(false);
             this.TPSubtitles.ResumeLayout(false);
+            this.TPAttachments.ResumeLayout(false);
             this.TPOptions.ResumeLayout(false);
             this.TPOptions.PerformLayout();
             this.TPOutput.ResumeLayout(false);
@@ -499,6 +534,9 @@
         private CMkvPropEdit.CustomControls.TrackInfoView subtitleTrackView;
         private System.Windows.Forms.ProgressBar PgLoading;
         private System.Windows.Forms.RichTextBox RTxtOutput;
+        private System.Windows.Forms.TabPage TPAttachments;
+        private CustomControls.GeneralInfoView generalInfoView1;
+        private CustomControls.AttachmentView attachmentView1;
     }
 }
 

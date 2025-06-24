@@ -1,4 +1,5 @@
 ﻿using CMkvPropEdit.Classes;
+using CMkvPropEdit.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace CMkvPropEdit.CustomControls
     {
         private TrackType Type;
         private string DefaultTrackName;
-        private readonly string EnabledProperty = "IsEnabled";
+        private static readonly string EnabledProperty = "IsEnabled";
         private List<TrackInfo> trackInfos;
         internal List<TrackInfo> TrackInfos
         {
@@ -81,7 +82,7 @@ namespace CMkvPropEdit.CustomControls
 
         private void SetSelectedItem(TrackInfo info)
         {
-            ClearBindings(GetAllControls(this, typeof(CheckBox), typeof(RadioButton), typeof(ComboBox), typeof(NumericUpDown), typeof(TextBox)));
+            ClearBindings(ViewService.GetAllControls(this, typeof(CheckBox), typeof(RadioButton), typeof(ComboBox), typeof(NumericUpDown), typeof(TextBox)));
 
             SetEnabled(CBDefaultTrack, CBTrackName, CBLanguage, CBParameters, CBForcedTrack);
             
@@ -112,15 +113,6 @@ namespace CMkvPropEdit.CustomControls
             {
                 RBForcedNo.Checked = true;
             }
-        }
-
-        public IEnumerable<Control> GetAllControls(Control control, params Type[] types)
-        {
-            var controls = control.Controls.Cast<Control>();
-
-            return controls.SelectMany(ctrl => GetAllControls(ctrl, types))
-                                      .Concat(controls)
-                                      .Where(c => types.Contains(c.GetType()));
         }
 
         private Binding TwoWayBinding(string property, object source, string dataMember)

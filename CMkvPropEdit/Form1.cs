@@ -16,13 +16,23 @@ namespace CMkvPropEdit
     {
         private string DefaultPresetPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CMkvPropEdit", "Presets");
         private readonly string FileExtension = ".mkv";
-        public Form1()
+        public Form1(string[] paths)
         {
             InitializeComponent();
             videoTrackView.SetType(TrackType.Video);
             audioTrackView.SetType(TrackType.Audio);
             subtitleTrackView.SetType(TrackType.Subtitle);
             InitSettings();
+            AddPaths(paths);
+        }
+
+        private void AddPaths(string[] paths)
+        {
+            var files = paths
+                .SelectMany(file => File.Exists(file) ? new string[] { file } : Directory.GetFiles(file, $"*{FileExtension}", SearchOption.AllDirectories))
+                .Where(file => Path.GetExtension(file) == FileExtension)
+                .ToArray();
+            AddFiles(files);
         }
 
         private void InitSettings()
@@ -77,7 +87,7 @@ namespace CMkvPropEdit
         private void LBInput_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            AddFiles(files.SelectMany(file => Path.HasExtension(file) ? new string[] { file } : Directory.GetFiles(file, $"*{FileExtension}", SearchOption.AllDirectories)).Where(file => Path.GetExtension(file) == FileExtension).ToArray());
+            AddPaths(files);
         }
 
         private void BtnInputClear_Click(object sender, EventArgs e)
@@ -322,7 +332,7 @@ namespace CMkvPropEdit
         {
             StartProgressBar(LBInput.Items.Count);
             ClearOutput();
-            ExecuteService.SetCmdLine(null, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), null, LBInput.Items.Cast<string>().ToArray(), Updates);
+            ExecuteService.Execute(generalInfoView1.Info, videoTrackView.TrackInfos.ToArray(), audioTrackView.TrackInfos.ToArray(), subtitleTrackView.TrackInfos.ToArray(), attachmentView1.Attachments, LBInput.Items.Cast<string>().ToArray(), Updates);
         }
 
         private void ClearOutput()

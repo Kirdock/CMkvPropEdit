@@ -19,7 +19,7 @@ namespace CMkvPropEdit.Helper
             return new string('0', pad - numberLength) + number;
         }
 
-        private static StringBuilder SetCmdLineGeneral(GeneralInfo info, string fileName, int index)
+        private static StringBuilder GetGeneralLine(GeneralInfo info, string fileName, int index)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -145,22 +145,16 @@ namespace CMkvPropEdit.Helper
             return fileCmd;
         }
 
-        private static string SetCmdLineAttachmentsAdd(DataTable table)
+        private static string GetAddAttachmentLine(AddAttachment[] attachments)
         {
-            StringBuilder attachments = new StringBuilder();
+            StringBuilder command = new StringBuilder();
 
-            foreach(DataRow row in table.AsEnumerable())
+            foreach(AddAttachment attachment in attachments)
             {
-                string file = row[0].ToString();
-                string name = row[1].ToString();
-                string desc = row[2].ToString();
-                string mime = row[3].ToString();
-
-
-                SetAttachmentMeta(name, desc, mime, attachments);
-                attachments.Append($" --add-attachment \"{file}\"");
+                SetAttachmentMeta(attachment.Name, attachment.Description, attachment.MimeType, command);
+                command.Append($" --add-attachment \"{attachment.File}\"");
             }
-            return attachments.ToString();
+            return command.ToString();
         }
 
         private static void SetAttachmentMeta(string name, string desc, string mime, StringBuilder builder)
@@ -181,97 +175,92 @@ namespace CMkvPropEdit.Helper
             }
         }
 
-        private static string SetCmdLineAttachmentsReplace(DataTable table)
+        private static string GetReplaceAttachmentLine(ReplaceAttachment[] attachments)
         {
-            StringBuilder attachmentsReplace = new StringBuilder();
+            StringBuilder command = new StringBuilder();
 
-            foreach(DataRow row in table.AsEnumerable())
+            foreach(ReplaceAttachment attachment in attachments)
             {
-                AttachmentType type = (AttachmentType)row[0];
-                string orig = row[1].ToString();
-                string replace = row[2].ToString();
-                string name = row[3].ToString();
-                string desc = row[4].ToString();
-                string mime = row[5].ToString();
+                SetAttachmentMeta(attachment.Name, attachment.Description, attachment.MimeType, command);
 
-
-                SetAttachmentMeta(name, desc, mime, attachmentsReplace);
-
-                switch (type)
+                switch (attachment.Type)
                 {
                     case AttachmentType.Name:
-                        attachmentsReplace.Append($" --replace-attachment \"name:{orig}:{replace}\"");
+                        command.Append($" --replace-attachment \"name:{attachment.Value}:{attachment.Replacement}\"");
                         break;
                     case AttachmentType.Id:
-                        attachmentsReplace.Append($" --replace-attachment \"{orig}:{replace}\"");
+                        command.Append($" --replace-attachment \"{attachment.Value}:{attachment.Replacement}\"");
                         break;
                     case AttachmentType.Type:
-                        attachmentsReplace.Append($" --replace-attachment \"mime-type:{orig}:{replace}\"");
+                        command.Append($" --replace-attachment \"mime-type:{attachment.Value}:{attachment.Replacement}\"");
                         break;
                 }
             }
-            return attachmentsReplace.ToString();
+            return command.ToString();
         }
 
-        private static string SetCmdLineAttachmentsDelete(DataTable table)
+        private static string GetDeleteAttachmentLine(DeleteAttachment[] attachments)
         {
-            StringBuilder attachmentDelete = new StringBuilder();
+            StringBuilder command = new StringBuilder();
 
-            foreach(DataRow row in table.AsEnumerable())
+            foreach(DeleteAttachment attachment in attachments)
             {
-                AttachmentType type = (AttachmentType)row[0];
-                string value = row[1].ToString();
-
-                switch (type)
+                switch (attachment.Type)
                 {
                     case AttachmentType.Name:
-                        attachmentDelete.Append(" --delete-attachment \"name:{value}\"");
+                        command.Append(" --delete-attachment \"name:{value}\"");
                         break;
                     case AttachmentType.Id:
-                        attachmentDelete.Append($" --delete-attachment \"{value}\"");
+                        command.Append($" --delete-attachment \"{attachment.Value}\"");
                         break;
                     case AttachmentType.Type:
-                        attachmentDelete.Append($" --delete-attachment \"mime-type:{value}\"");
+                        command.Append($" --delete-attachment \"mime-type:{attachment.Value}\"");
                         break;
                 }
             }
-            return attachmentDelete.ToString();
+            return command.ToString();
         }
 
-        internal static void SetCmdLine(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action<string, string> update)
+        internal static void Execute(GeneralInfo generalInfo, TrackInfo[] videoInfo, TrackInfo[] audioInfo, TrackInfo[] subtitleInfo, Attachments attachments, string[] fileNames, Action<string, string> update)
         {
-            //string[] cmdLineGeneralOpt = SetCmdLineGeneral(generalInfo, fileNames);
-
-            //string cmdLineAttachmentsAddOpt = SetCmdLineAttachmentsAdd(attachments.AddTable);
-            //string cmdLineAttachmentsDeleteOpt = SetCmdLineAttachmentsReplace(attachments.ReplaceTable);
-            //string cmdLineAttachmentsReplaceOpt = SetCmdLineAttachmentsDelete(attachments.DeleteTable);
-
             Thread thread = new Thread(() =>
             {
                 try
                 {
+                    string cmdLineAttachmentsAddOpt = GetAddAttachmentLine(attachments.AddAttachments);
+                    string cmdLineAttachmentsReplaceOpt = GetReplaceAttachmentLine(attachments.ReplaceAttachments);
+                    string cmdLineAttachmentsDeleteOpt = GetDeleteAttachmentLine(attachments.DeleteAttachments);
+
                     for (int i = 0; i < fileNames.Length; i++)
                     {
                         string fileName = fileNames[i];
-                        //string cmdLineAllOpt = cmdLineGeneralOpt[i] + cmdLineAttachmentsDeleteOpt + cmdLineAttachmentsAddOpt
-                        //        + cmdLineAttachmentsReplaceOpt + cmdLineVideoOpt[i] + cmdLineAudioOpt[i] + cmdLineSubtitleOpt[i];
-
-                        string command = $"\"{fileName}\"" + GetTrackLine(videoInfo, fileName, i) + GetTrackLine(audioInfo, fileName, i) + GetTrackLine(subtitleInfo, fileName, i);
-                        System.Diagnostics.Process process = new System.Diagnostics.Process
+                        string command = $"\"{fileName}\""
+                                        + GetGeneralLine(generalInfo, fileName, i)
+                                        + cmdLineAttachmentsDeleteOpt
+                                        + cmdLineAttachmentsAddOpt
+                                        + cmdLineAttachmentsReplaceOpt
+                                        + GetTrackLine(videoInfo, fileName, i)
+                                        + GetTrackLine(audioInfo, fileName, i)
+                                        + GetTrackLine(subtitleInfo, fileName, i);
+                        using (System.Diagnostics.Process process = new System.Diagnostics.Process
                         {
                             StartInfo = new System.Diagnostics.ProcessStartInfo
                             {
                                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                                 RedirectStandardOutput = true,
                                 UseShellExecute = false,
+                                CreateNoWindow = true,
                                 FileName = Properties.Settings.Default.MKVPropeditPath,
-                                Arguments = command
-                            }
-                        };
-                        process.Start();
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-                        update(command, output);
+                                Arguments = command,
+                                StandardOutputEncoding = Encoding.UTF8
+                            },
+                        })
+                        {
+                            process.Start();
+                            string output = process.StandardOutput.ReadToEnd();
+                            process.WaitForExit();
+                            update(command, output);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -279,6 +268,7 @@ namespace CMkvPropEdit.Helper
                     MessageService.ShowError(ex.Message);
                 }
             });
+            thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
